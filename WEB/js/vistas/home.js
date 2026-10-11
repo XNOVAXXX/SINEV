@@ -35,4 +35,40 @@ RUTAS[''] = async () => {
   }
   const kpis = $('#kpis');   // puede no existir si el usuario cambió de página mientras cargaba
   if (kpis) kpis.innerHTML = html;
+  await graficasInicio();
 };
+
+// ── Gráficas del personal ──
+// Barras horizontales: cada fila lleva su nombre y su número, así el color nunca es la única pista
+function barras(titulo, filas, nota = '') {
+  const max = Math.max(1, ...filas.map(f => f.total)), suma = filas.reduce((a, f) => a + f.total, 0);
+  const pct = n => suma ? (n / suma * 100).toLocaleString('es-CO', { maximumFractionDigits: 1 }) + ' %' : '';
+  return `<div class="card chart"><h3>${esc(titulo)}</h3><div class="bars" role="list">${filas.map(f => `
+    <div class="bar-row" role="listitem" title="${esc(f.etiqueta)}: ${Number(f.total).toLocaleString('es-CO')} (${pct(f.total)})">
+      <span class="bar-label">${esc(f.etiqueta)}</span>
+      <span class="bar-track"><i style="width:${Math.max(f.total / max * 100, f.total ? 1.5 : 0)}%"></i></span>
+      <b class="bar-value">${Number(f.total).toLocaleString('es-CO')}</b>
+    </div>`).join('') || '<p class="demo">Sin datos.</p>'}</div>${nota ? `<p class="demo">${esc(nota)}</p>` : ''}</div>`;
+}
+const ETIQ_EURO = { sin_dato: 'Sin dato', electrico: 'Eléctrico (no aplica)' };
+async function graficasInicio() {
+  const cont = $('#charts');
+  if (!cont) return;
+  const [{ data: st, error }, { data: camps }] = await Promise.all([
+    sb.rpc('estadisticas'),
+    sb.from('campanas').select('nombre,creada_en,total').order('creada_en', { ascending: false }).limit(8)]);
+  if (!$('#charts')) return;   // el usuario cambió de página mientras cargaba
+  if (error) {
+    cont.innerHTML = `<div class="card"><p class="err">No se pudieron cargar las gráficas. ¿Ya ejecutaste <code>08_estadisticas.sql</code> en Supabase?</p></div>`;
+    cont.hidden = false; return;
+  }
+  const euro = (st.por_euro ?? []).map(r => ({ etiqueta: ETIQ_EURO[r.clave] ?? 'EURO ' + r.clave, total: r.total }));
+  const comb = (st.por_combustible ?? []).map(r => ({ etiqueta: combTxt(r.clave), total: r.total }));
+  const ciudad = (st.por_ciudad ?? []).map(r => ({ etiqueta: r.clave, total: r.total }));
+  const avisos = (camps ?? []).slice().reverse().map(c => ({ etiqueta: `${c.nombre} · ${fechaCorta(c.creada_en)}`, total: c.total }));
+  cont.innerHTML = barras('Vehículos por norma EURO', euro, 'EURO 1 a 3 no cumplen el mínimo (EURO 4).')
+    + barras('Vehículos por combustible', comb)
+    + barras('Vehículos por ciudad', ciudad)
+    + barras('Avisos enviados por campaña', avisos, avisos.length ? 'Últimas 8 campañas, de la más antigua a la más reciente.' : 'Aún no se ha ejecutado ninguna campaña.');
+  cont.hidden = false;
+}

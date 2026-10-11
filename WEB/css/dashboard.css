@@ -119,3 +119,42 @@
         grid-template-columns: 1fr
     }
 }
+
+
+/* Botones de filtrar y exportar */
+.filtros-acciones {
+    justify-content: flex-start
+}
+
+#fxmsg:empty {
+    display: none
+}
+
+/* Detalle de campaña */
+.modal-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px
+}
+
+.modal-head h3 {
+    margin: 0
+}
+
+.modal .row {
+    justify-content: space-between;
+    align-items: center
+}
+
+.dlg-tabla {
+    max-height: min(60vh, 520px);
+    overflow: auto;
+    border: 1px solid var(--l);
+    border-radius: 10px
+}
+
+.dlg-tabla th {
+    position: sticky;
+    top: 0
+}

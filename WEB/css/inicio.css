@@ -204,3 +204,66 @@
         flex-wrap: wrap
     }
 }
+
+/* Gráficas del personal */
+.charts {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 440px), 1fr));
+    gap: 16px;
+    margin-top: 16px
+}
+
+.charts[hidden] {
+    display: none
+}
+
+.chart {
+    margin: 0
+}
+
+.bars {
+    display: grid;
+    gap: 8px;
+    margin-bottom: 10px
+}
+
+.bar-row {
+    display: grid;
+    grid-template-columns: minmax(90px, 38%) 1fr auto;
+    gap: 10px;
+    align-items: center;
+    font-size: 13px;
+    padding: 2px 4px;
+    border-radius: 6px
+}
+
+.bar-row:hover {
+    background: #f3f4f6
+}
+
+.bar-label {
+    color: #374151;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap
+}
+
+.bar-track {
+    height: 12px;
+    background: #f3f4f6;
+    border-radius: 0 4px 4px 0
+}
+
+.bar-track i {
+    display: block;
+    height: 100%;
+    background: var(--b);
+    border-radius: 0 4px 4px 0
+}
+
+.bar-value {
+    font-variant-numeric: tabular-nums;
+    min-width: 3ch;
+    text-align: right;
+    color: #111827
+}

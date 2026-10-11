@@ -27,18 +27,33 @@ function vistaDatos() {
     ${sel('fe', 'Norma EURO', [...[1,2,3,4,5,6].map(n => [String(n), 'EURO ' + n]), ['null', 'Sin dato']], T.euro)}
     ${sel('fs', 'Estado', [['en circulacion', 'En circulación'], ['fuera de circulacion', 'Fuera de circulación']], T.estado)}
     ${sel('fc', 'Combustible', ['Diesel','Hibrido','Electrico','Gasolina'].map(c => [c, combTxt(c)]), T.comb)}
-    <button class="btn">Filtrar</button></form></div>
+    <div class="row filtros-acciones"><button class="btn">Filtrar</button><button class="btn ghost" type="button" id="fx" title="Descarga todos los vehículos que cumplen los filtros"><i data-lucide="download"></i> Exportar</button></div></form><p class="err" id="fxmsg"></p></div>
     <div class="card"><div class="tblwrap" id="tbl">Cargando…</div><div class="pager" id="pg"></div></div>`;
-  $('#ff').onsubmit = e => { e.preventDefault(); Object.assign(T, { q: $('#fq').value, euro: $('#fe').value, estado: $('#fs').value, comb: $('#fc').value, page: 0 }); cargarDatos(); };
+  const leerFiltros = () => Object.assign(T, { q: $('#fq').value, euro: $('#fe').value, estado: $('#fs').value, comb: $('#fc').value, page: 0 });
+  $('#ff').onsubmit = e => { e.preventDefault(); leerFiltros(); cargarDatos(); };
+  $('#fx').onclick = async () => {
+    leerFiltros(); const btn = $('#fx'), msg = $('#fxmsg'); btn.disabled = true; msg.textContent = '';
+    try {
+      const filas = await todasLasFilas(() => filtrarVehiculos(sb.from('vehiculos').select('*')).order('placa'));
+      descargarCSV(`sinev-vehiculos-${hoyISO()}.csv`, ['Placa', 'Propietario', 'Cédula', 'Teléfono', 'Correo', 'Dirección', 'Modelo', 'Combustible', 'Kilometraje (km)', 'Norma EURO', 'Estado'],
+        filas.map(v => [v.placa, v.nombre, v.cedula, v.telefono, v.correo, v.direccion, v.modelo, combTxt(v.combustible), v.kilometraje,
+          v.combustible === 'Electrico' ? 'No aplica' : v.nivel_euro ? 'EURO ' + v.nivel_euro : 'Sin dato', estadoTxt(v.estado)]));
+    } catch (e) { msg.textContent = 'No se pudo exportar: ' + e.message; }
+    btn.disabled = false;
+  };
   cargarDatos();
 }
-async function cargarDatos() {
-  let q = sb.from('vehiculos').select('*', { count: 'exact' }).order('placa').range(T.page * T.size, T.page * T.size + T.size - 1);
+// Aplica los filtros del Dashboard a una consulta de vehículos (la usan la tabla y la exportación)
+function filtrarVehiculos(q) {
   const s = T.q.replace(/[^\p{L}\p{N} .@_-]/gu, '').trim();
   if (s) q = q.or(`placa.ilike.%${s}%,cedula.ilike.%${s}%,nombre.ilike.%${s}%`);
   if (T.euro === 'null') q = q.is('nivel_euro', null); else if (T.euro) q = q.eq('nivel_euro', +T.euro);
   if (T.estado) q = q.eq('estado', T.estado);
   if (T.comb) q = q.eq('combustible', T.comb);
+  return q;
+}
+async function cargarDatos() {
+  const q = filtrarVehiculos(sb.from('vehiculos').select('*', { count: 'exact' })).order('placa').range(T.page * T.size, T.page * T.size + T.size - 1);
   const { data, count, error } = await q;
   if (error) { $('#tbl').innerHTML = `<p class="err">${esc(error.message)}</p>`; return; }
   $('#tbl').innerHTML = `<table><thead><tr><th>Placa</th><th>Propietario</th><th>Cédula</th><th>Teléfono</th><th>Modelo</th><th>Combustible</th><th>Kilometraje</th><th>EURO</th><th>Estado</th></tr></thead><tbody>${
@@ -147,9 +162,39 @@ const resumenFiltros = c => [
 async function historialCampanas() {
   const { data, error } = await sb.from('campanas').select('*').order('creada_en', { ascending: false }).limit(20);
   $('#hist').innerHTML = error ? `<p class="err">${esc(error.message)}</p>` : data.length
-    ? `<table><thead><tr><th>Fecha</th><th>Campaña</th><th>EURO</th><th>Estado</th><th>Filtros</th><th>Canales</th><th>Vehículos</th><th>Ejecutó</th></tr></thead><tbody>${data.map(c => `<tr>
+    ? `<table><thead><tr><th>Fecha</th><th>Campaña</th><th>EURO</th><th>Estado</th><th>Filtros</th><th>Canales</th><th>Vehículos</th><th>Ejecutó</th></tr></thead><tbody>${data.map(c => `<tr class="click" data-id="${c.id}" title="Ver los avisos de esta campaña">
       <td class="num">${fechaCO(c.creada_en)}</td><td><b>${esc(c.nombre)}</b></td><td class="num">${c.niveles.join(', ')}</td><td class="num">${esc(estadoTxt(c.estado_filtro))}</td><td>${esc(resumenFiltros(c))}</td><td>${esc(canalesTxt(c.canales))}</td><td>${c.total}</td><td>${esc(c.ejecutada_por)}</td></tr>`).join('')}</tbody></table>`
     : '<p>Aún no se ha ejecutado ninguna campaña.</p>';
+  if (!error) document.querySelectorAll('#hist tr.click').forEach(tr => tr.onclick = () => detalleCampana(data.find(c => c.id === +tr.dataset.id)));
+}
+
+// Detalle de una campaña: a qué vehículos se notificó y con qué aviso
+async function detalleCampana(c) {
+  let dlg = $('#dlgCampana');
+  if (!dlg) { dlg = document.createElement('dialog'); dlg.id = 'dlgCampana'; dlg.className = 'w'; document.body.append(dlg); }
+  dlg.innerHTML = `<div class="modal"><div class="modal-head"><h3>${esc(c.nombre)}</h3><button class="btn ghost" data-close aria-label="Cerrar">✕</button></div>
+    <p class="demo">${esc(fechaCO(c.creada_en))} · ejecutó ${esc(c.ejecutada_por ?? '—')} · EURO ${c.niveles.join(', ')} · ${esc(estadoTxt(c.estado_filtro))} · ${esc(resumenFiltros(c))} · ${esc(canalesTxt(c.canales))}</p>
+    <div class="tblwrap dlg-tabla" id="dcTabla">Cargando…</div>
+    <div class="row"><span class="demo" id="dcTotal"></span><button class="btn ghost" id="dcExportar" disabled><i data-lucide="download"></i> Exportar</button></div></div>`;
+  dlg.showModal(); icons();
+  let avisos;
+  try {
+    avisos = await todasLasFilas(() => sb.from('notificaciones')
+      .select('placa,numero_aviso,tipo,motivo,fecha,correo,sms,whatsapp,vehiculos(nombre,cedula,nivel_euro,combustible)')
+      .eq('campana_id', c.id).order('placa'));
+  } catch (e) { $('#dcTabla').innerHTML = `<p class="err">${esc(e.message)}</p>`; return; }
+  if (!dlg.open) return;
+  const canales = n => canalesTxt(['correo', 'sms', 'whatsapp'].filter(k => n[k]));
+  $('#dcTotal').textContent = `${avisos.length.toLocaleString('es-CO')} avisos registrados`;
+  $('#dcTabla').innerHTML = avisos.length ? `<table><thead><tr><th>Placa</th><th>Propietario</th><th>EURO</th><th>Aviso</th><th>Canales</th></tr></thead><tbody>${
+    avisos.map(n => `<tr class="click" data-p="${esc(n.placa)}" title="Ver la consulta de ${esc(n.placa)}"><td><b>${esc(n.placa)}</b></td><td>${esc(n.vehiculos?.nombre)}</td>
+      <td>${badge(n.vehiculos?.nivel_euro, n.vehiculos?.combustible)}</td><td class="num">${n.numero_aviso}.º aviso</td><td>${esc(canales(n))}</td></tr>`).join('')}</tbody></table>`
+    : '<p>Esta campaña no registró avisos.</p>';
+  dlg.querySelectorAll('tr.click').forEach(tr => tr.onclick = () => { dlg.close(); location.hash = '#/consultas/' + encodeURIComponent(tr.dataset.p); });
+  const btn = $('#dcExportar'); btn.disabled = !avisos.length;
+  btn.onclick = () => descargarCSV(`sinev-campana-${c.id}-${hoyISO()}.csv`, ['Placa', 'Propietario', 'Cédula', 'Norma EURO', 'Número de aviso', 'Tipo', 'Motivo', 'Fecha', 'Correo', 'SMS', 'WhatsApp'],
+    avisos.map(n => [n.placa, n.vehiculos?.nombre, n.vehiculos?.cedula, n.vehiculos?.nivel_euro ? 'EURO ' + n.vehiculos.nivel_euro : 'Sin dato', n.numero_aviso,
+      n.tipo, n.motivo, fechaCO(n.fecha), n.correo ? 'Sí' : 'No', n.sms ? 'Sí' : 'No', n.whatsapp ? 'Sí' : 'No']));
 }
 
 // ── Usuarios internos (solo administrador) ──

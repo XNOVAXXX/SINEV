@@ -1,7 +1,7 @@
 # SINEV (HTML + CSS + JS + Supabase + Docker)
 SINEV es de **solo consulta**: nadie (público, operador ni administrador) puede editar ni eliminar información.
 
-1. Supabase → SQL Editor: ejecuta en orden `01_schema.sql`, `02_datos.sql`, `03_campanas.sql`, `04_actualizaciones.sql`, `05_sin_edicion.sql` y `06_privacidad.sql`.
+1. Supabase → SQL Editor: ejecuta en orden `01_schema.sql`, `02_datos.sql`, `03_campanas.sql`, `04_actualizaciones.sql`, `05_sin_edicion.sql`, `06_privacidad.sql` y `08_estadisticas.sql` (gráficas del inicio del personal).
    (Si ya tenías la base creada, ejecuta de nuevo `04`, `05` y `06`, en ese orden, y luego `07_corregir_datos.sql` para corregir los datos sintéticos; todos se pueden repetir sin problema.)
 2. `cp .env.example .env` y completa las claves (Settings → API) y las contraseñas de `admin` y `operador`. **Nunca subas el `.env` a Git** (`.env.example` solo debe tener valores de ejemplo).
 3. Crear los usuarios iniciales (una vez): `docker compose -f DOCKER/docker-compose.yml run --rm usuarios`
@@ -27,6 +27,11 @@ Cada vehículo tiene `kilometraje` (km; datos sintéticos generados por `04_actu
 
 ## Privacidad en Consultas
 Sin sesión se ven los datos del vehículo, pero los del propietario aparecen parcialmente ocultos (`06_privacidad.sql`): nombre con iniciales, cédula y teléfono con asteriscos, correo abreviado y solo la ciudad de la dirección. El personal los ve completos. La búsqueda por cédula (todos los vehículos de esa persona) es solo para el personal con sesión iniciada; sin sesión solo se consulta por placa.
+
+## Gráficas y exportar
+- Inicio (personal): gráficas de vehículos por norma EURO, combustible y ciudad, y avisos por campaña (`08_estadisticas.sql`).
+- Dashboard → Datos: **Exportar** descarga en CSV (se abre en Excel) todos los vehículos que cumplen los filtros.
+- Dashboard → Campañas: clic en una campaña ejecutada para ver a qué vehículos se notificó y exportar sus avisos.
 
 ## Campañas personalizadas
 Dashboard → Campañas. Filtros opcionales y combinables: niveles EURO 1-3, combustible, rango de kilometraje, rango de modelo, ciudad y estado de circulación. Asunto y mensaje propios con las variables `{nombre}` `{placa}` `{nivel}` `{modelo}` `{kilometraje}` `{combustible}` `{aviso}`; vacíos usan el texto oficial de cada aviso. Máximo 3 avisos por vehículo y al menos 20 días entre un aviso y el siguiente. Los avisos quedan registrados en SINEV; no se envían correos, SMS ni WhatsApp reales.

@@ -511,6 +511,11 @@ dialog::backdrop {
         display: none
     }
 
+    /* En el celular el rol basta para saber quién inició sesión */
+    #user > b {
+        display: none
+    }
+
     .modal.wide {
         grid-template-columns: 1fr
     }

@@ -52,7 +52,28 @@ const canalesTxt = cs => (cs ?? []).map(c => c === 'sms' ? 'SMS' : c === 'whatsa
 const badge = (n, comb) => comb === 'Electrico' ? '<span class="euro e0">No aplica</span>'
   : `<span class="euro e${n ?? 0}">${n ? 'EURO ' + n : 'EURO sin dato'}</span>`;
 const item = (l, v) => `<div><small>${l}</small><b>${esc(v)}</b></div>`;
+const fechaCorta = f => new Date(f).toLocaleDateString('es-CO', { day: 'numeric', month: 'short', year: 'numeric' });
 const fechaCO = f => new Date(f).toLocaleDateString('es-CO', { year: 'numeric', month: 'long', day: 'numeric' });
+
+// ── Exportar ──
+const hoyISO = () => new Date().toISOString().slice(0, 10);
+// Trae todas las filas de una consulta en bloques de 1000 (el máximo que entrega Supabase por llamada)
+async function todasLasFilas(crearConsulta, bloque = 1000) {
+  const filas = [];
+  for (let desde = 0; ; desde += bloque) {
+    const { data, error } = await crearConsulta().range(desde, desde + bloque - 1);
+    if (error) throw new Error(error.message);
+    filas.push(...data);
+    if (data.length < bloque) return filas;
+  }
+}
+// CSV para Excel en español: separador «;» y BOM para que respete las tildes
+function descargarCSV(nombre, columnas, filas) {
+  const celda = v => { const s = v == null ? '' : String(v); return /[;"\n\r]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s; };
+  const texto = '\ufeff' + [columnas, ...filas].map(f => f.map(celda).join(';')).join('\r\n');
+  const a = Object.assign(document.createElement('a'), { href: URL.createObjectURL(new Blob([texto], { type: 'text/csv;charset=utf-8' })), download: nombre });
+  document.body.append(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+}
 
 // ── Sesión ──
 async function cargarPerfil() {
