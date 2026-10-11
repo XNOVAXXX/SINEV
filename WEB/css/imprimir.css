@@ -1,0 +1,109 @@
+/* ════════════════════════════════════════════════════════════
+   Impresión / PDF de la ficha de consulta (botón «Imprimir / PDF»)
+   Solo se imprime el resultado: sin menú, buscador, tabla de referencia ni footer.
+   ════════════════════════════════════════════════════════════ */
+.print-head,
+.print-foot {
+    display: none
+}
+
+@media print {
+    @page {
+        size: A4;
+        margin: 14mm 12mm
+    }
+
+    :root {
+        color-scheme: light
+    }
+
+    body {
+        background: #fff !important;
+        color: #111827 !important;
+        display: block;
+        min-height: 0;
+        font-size: 12px;
+        print-color-adjust: exact;
+        -webkit-print-color-adjust: exact
+    }
+
+    .top,
+    header,
+    .site-footer,
+    .no-print,
+    #view > h1,
+    .consultation-search,
+    .euro-reference,
+    #msg {
+        display: none !important
+    }
+
+    main#view {
+        max-width: none;
+        padding: 0
+    }
+
+    .print-head {
+        display: block;
+        border-bottom: 2px solid #1e3a8a;
+        padding-bottom: 8px;
+        margin-bottom: 12px;
+        font-size: 13px;
+        color: #1e3a8a
+    }
+
+    .print-head b {
+        font-size: 18px
+    }
+
+    .print-head span {
+        color: #4b5563;
+        font-size: 12px
+    }
+
+    .print-foot {
+        display: block;
+        margin-top: 12px;
+        font-size: 10px;
+        color: #6b7280
+    }
+
+    /* Las tarjetas se imprimen claras y sin sombra, sin partirse entre páginas */
+    .card,
+    .banner,
+    .em,
+    .notif {
+        box-shadow: none !important;
+        break-inside: avoid
+    }
+
+    .card {
+        background: #fff !important;
+        color: #111827 !important;
+        border: 1px solid #d1d5db;
+        margin: 10px 0;
+        padding: 12px 14px
+    }
+
+    .banner.si,
+    .em.good {
+        background: #f0fdf4 !important;
+        border-color: #86efac !important
+    }
+
+    .banner.no,
+    .em.bad {
+        background: #fef2f2 !important;
+        border-color: #fca5a5 !important
+    }
+
+    .notif p,
+    .canal {
+        color: #374151 !important;
+        background: #fff !important
+    }
+
+    .grid {
+        grid-template-columns: repeat(3, 1fr)
+    }
+}

@@ -1,0 +1,218 @@
+/* ════════════════════════════════════════════════════════════
+   Modo oscuro: se activa solo cuando el equipo o el navegador del usuario lo usan
+   (prefers-color-scheme). Solo en pantalla: al imprimir la ficha siempre sale clara. Los colores de las normas EURO y de los avisos se mantienen.
+   ════════════════════════════════════════════════════════════ */
+@media screen and (prefers-color-scheme: dark) {
+    :root {
+        color-scheme: dark;
+        --g: #9ca3af;
+        --l: #2b3648;
+        --bd: #93c5fd
+    }
+
+    body,
+    .login-screen {
+        background: #0b1220;
+        color: #e5e7eb
+    }
+
+    /* Superficies */
+    header,
+    .card,
+    .kpi,
+    .paso,
+    dialog,
+    .reference-toggle,
+    .login-form-panel {
+        background: #131c2e;
+        color: #e5e7eb
+    }
+
+    .card,
+    .kpi,
+    .paso,
+    header {
+        box-shadow: 0 1px 6px #0008
+    }
+
+    .reference-toggle:hover {
+        background: #17223a
+    }
+
+    .top {
+        background: #0f1a33
+    }
+
+    .site-footer {
+        background: #0e1626
+    }
+
+    /* Texto */
+    .brand b,
+    .reference-toggle,
+    .login-form h2,
+    .bar-value,
+    .euro-table th,
+    #nav a,
+    .checks label {
+        color: #e5e7eb
+    }
+
+    .notif p,
+    .paso p,
+    .bar-label,
+    .msg-preview p,
+    .login-form label,
+    .euro-table td,
+    .euro-table td:last-child {
+        color: #cbd5e1
+    }
+
+    .login-back,
+    .reference-toggle>#euroChevron {
+        color: #94a3b8
+    }
+
+    /* Campos */
+    input,
+    select,
+    textarea,
+    .form-grid textarea,
+    .login-input,
+    .hero-input {
+        background: #0f172a;
+        color: #e5e7eb;
+        border-color: #334155
+    }
+
+    .hero-input input,
+    .login-input input {
+        background: transparent;
+        color: #e5e7eb
+    }
+
+    .btn.ghost {
+        background: #131c2e;
+        color: #e5e7eb;
+        border-color: #334155
+    }
+
+    /* Tablas */
+    th,
+    .euro-table th {
+        background: #1b2538
+    }
+
+    td,
+    .euro-table td {
+        border-top-color: #222c3f
+    }
+
+    tbody tr.click:hover,
+    .bar-row:hover,
+    #nav a:hover {
+        background: #1c2a45
+    }
+
+    .euro-table tbody tr.minimum {
+        background: #131c2e
+    }
+
+    /* Bloques de color suave */
+    .chip {
+        background: #1e3a8a;
+        color: #dbeafe
+    }
+
+    .chip.rol-administrador {
+        background: #3b0764;
+        color: #e9d5ff
+    }
+
+    .chip.rol-operador {
+        background: #431407;
+        color: #fed7aa
+    }
+
+    .estado.activo {
+        background: #14532d;
+        color: #bbf7d0
+    }
+
+    .estado.inactivo {
+        background: #1f2937;
+        color: #d1d5db
+    }
+
+    .banner.si,
+    .em.good {
+        background: #052e1a;
+        border-color: #166534
+    }
+
+    .banner.no,
+    .em.bad {
+        background: #3a0d0d;
+        border-color: #7f1d1d
+    }
+
+    .banner.nd {
+        background: #1f2937;
+        border-color: #374151
+    }
+
+    .bar2,
+    .bar-track,
+    .consultation-search .tab,
+    .hint code {
+        background: #1f2937
+    }
+
+    .prev,
+    .paso-icon {
+        background: #172554;
+        border-color: #1e3a8a
+    }
+
+    .canal,
+    .msg-preview {
+        background: #0f172a;
+        border-color: #334155;
+        color: #9ca3af
+    }
+
+    .canal.si {
+        background: #052e1a;
+        border-color: #166534;
+        color: #86efac
+    }
+
+    .err {
+        color: #fca5a5
+    }
+
+    .ok {
+        color: #86efac
+    }
+
+    .subtabs button {
+        color: #e5e7eb
+    }
+
+    .subtabs .on {
+        color: #93c5fd;
+        border-color: #60a5fa
+    }
+
+    #nav a.on {
+        color: #fff
+    }
+
+    .hero {
+        background: linear-gradient(90deg, #1d4ed8, #172554)
+    }
+
+    .hero .hero-search .btn {
+        background: #020617
+    }
+}

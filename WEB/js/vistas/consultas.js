@@ -88,6 +88,9 @@ function mostrar() {
     : cumple ? '✓ Vehículo dentro de la Norma EURO vigente' : '✗ Vehículo NO cumple la Norma EURO mínima (EURO 4)';
   const completo = puede('dashboard');   // el personal ve los datos del propietario sin ocultar
   $('#res').innerHTML = `
+  <div class="print-head"><b>SINEV</b> · Sistema Integrado de Notificación por Emisiones Vehiculares<br>
+    <span>Ficha de consulta vehicular · Placa ${esc(v.placa)} · Generada el ${esc(new Date().toLocaleString('es-CO', { dateStyle: 'long', timeStyle: 'short' }))}</span></div>
+  <div class="row result-actions no-print"><button class="btn ghost" id="imprimir" type="button"><i data-lucide="printer"></i> Imprimir / PDF</button></div>
   <div class="banner ${cumple == null ? 'nd' : cumple ? 'si' : 'no'}"><h3 class="banner-title">${titulo} ${badge(n, v.combustible)}</h3></div>
   <div class="card"><h3>Información del Vehículo</h3><div class="grid">
     ${item('Placa', v.placa)}${item('Modelo (año)', v.modelo)}${item('Combustible', combTxt(v.combustible))}
@@ -98,7 +101,10 @@ function mostrar() {
   <div class="card"><h3>Propietario</h3><div class="grid">
     ${item('Nombre', v.nombre)}${item('Cédula', v.cedula)}${item('Teléfono', v.telefono)}${item('Correo', v.correo)}${item(completo ? 'Dirección' : 'Ciudad', v.direccion)}</div>
     ${completo ? '' : '<p class="demo" style="margin-top:12px">Por privacidad, los datos del propietario se muestran parcialmente ocultos.</p>'}</div>
-  ${bloqueNotificaciones(cumple)}`;
+  ${bloqueNotificaciones(cumple)}
+  <p class="print-foot">Proyecto educativo: datos ficticios. Las emisiones se estiman a partir de la norma EURO y del kilometraje registrado.</p>`;
+  // Para guardar como PDF: en la ventana de impresión elige «Guardar como PDF»
+  $('#imprimir').onclick = () => window.print();
   icons();
 }
 // Los registros son de solo lectura: ningún rol puede modificarlos ni eliminarlos
