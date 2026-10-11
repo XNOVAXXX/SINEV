@@ -1,13 +1,25 @@
 <section class="hero">
   <h1>Sistema Integrado de Notificación por Emisiones Vehiculares</h1>
   <p id="homeIntro"></p>
+  <form class="hero-search" id="heroBuscar" role="search">
+    <span class="hero-input"><i data-lucide="search"></i><input id="heroPlaca" maxlength="7" placeholder="Escribe la placa, ej: GKV921" autocomplete="off" aria-label="Placa del vehículo"></span>
+    <button class="btn">Consultar</button>
+  </form>
+  <p class="hero-msg" id="heroMsg"></p>
   <div class="row home-actions">
-    <a class="btn" href="#/consultas"><i data-lucide="search"></i> Consultar vehículo</a>
     <a class="btn alt" id="homeDashboard" href="#/dashboard"><i data-lucide="layout-dashboard"></i> Dashboard y campañas</a>
-    <button class="btn alt" id="heroLogin"><i data-lucide="log-in"></i> Acceso interno</button>
+    <button class="btn alt" id="heroLogin" type="button"><i data-lucide="log-in"></i> Acceso interno</button>
   </div>
 </section>
 <div class="kpis" id="kpis"></div>
+<section class="pasos" id="pasos">
+  <h2>¿Cómo funciona?</h2>
+  <div class="pasos-grid">
+    <div class="paso"><span class="paso-icon"><i data-lucide="search"></i></span><b>1. Consulta tu placa</b><p>Escribe la placa y SINEV muestra la norma EURO registrada de tu vehículo.</p></div>
+    <div class="paso"><span class="paso-icon"><i data-lucide="gauge"></i></span><b>2. Revisa tus emisiones</b><p>Compara las emisiones estimadas con el límite de la norma EURO 4, la mínima exigida.</p></div>
+    <div class="paso"><span class="paso-icon"><i data-lucide="bell"></i></span><b>3. Atiende los avisos</b><p>Si no cumples, verás los avisos registrados y cómo regularizar tu vehículo.</p></div>
+  </div>
+</section>
 <div class="card home-about">
   <h3>¿Qué es SINEV?</h3>
   <p>Plataforma que permite a los propietarios verificar si su vehículo cumple la Norma EURO 4 o superior, y al personal autorizado gestionar los datos y notificar a quienes incumplen.</p>

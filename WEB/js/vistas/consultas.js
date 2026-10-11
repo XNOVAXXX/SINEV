@@ -5,7 +5,7 @@ RUTAS.consultas = async param => {
   vehiculo = null; tipo = 'placa';
   $('#view').innerHTML = await cargarVista('consultas');
   // La búsqueda por cédula es solo para el personal (la base de datos también lo exige)
-  if (!puede('dashboard')) $('.tab[data-t="documento"]').remove();
+  if (!puede('dashboard')) $('.consultation-search .tabs').remove();
   document.querySelectorAll('.tab').forEach(b => b.onclick = () => {
     tipo = b.dataset.t; document.querySelectorAll('.tab').forEach(x => x.classList.toggle('on', x === b));
     $('#q').value = ''; $('#q').maxLength = tipo === 'placa' ? 7 : 12; $('#q').placeholder = tipo === 'placa' ? 'Ej: GKV921' : 'Ej: 1001208436';
@@ -41,8 +41,8 @@ async function abrirVehiculo(v) {
 function elegirVehiculo(lista) {
   $('#res').innerHTML = `<div class="card"><h3>Vehículos registrados con este documento (${lista.length})</h3>
     <div class="tblwrap"><table><thead><tr><th>Placa</th><th>Modelo</th><th>Combustible</th><th>EURO</th><th>Estado</th></tr></thead><tbody>${
-    lista.map((v, i) => `<tr class="click" data-i="${i}"><td><b>${esc(v.placa)}</b></td><td>${esc(v.modelo)}</td><td>${esc(v.combustible)}</td>
-      <td>${badge(v.nivel_euro, v.combustible)}</td><td>${esc(v.estado)}</td></tr>`).join('')}</tbody></table></div>
+    lista.map((v, i) => `<tr class="click" data-i="${i}"><td><b>${esc(v.placa)}</b></td><td>${esc(v.modelo)}</td><td>${esc(combTxt(v.combustible))}</td>
+      <td>${badge(v.nivel_euro, v.combustible)}</td><td>${estadoChip(v.estado)}</td></tr>`).join('')}</tbody></table></div>
     <p class="demo">Seleccione un vehículo para ver el detalle.</p></div>`;
   document.querySelectorAll('#res tr.click').forEach(tr => tr.onclick = () => abrirVehiculo(lista[+tr.dataset.i]));
 }
@@ -90,8 +90,8 @@ function mostrar() {
   $('#res').innerHTML = `
   <div class="banner ${cumple == null ? 'nd' : cumple ? 'si' : 'no'}"><h3 class="banner-title">${titulo} ${badge(n, v.combustible)}</h3></div>
   <div class="card"><h3>Información del Vehículo</h3><div class="grid">
-    ${item('Placa', v.placa)}${item('Modelo (año)', v.modelo)}${item('Combustible', v.combustible)}
-    ${item('Norma EURO', electrico ? 'No aplica (eléctrico)' : n ? 'EURO ' + n : v.version_euro)}${item('Estado', v.estado)}${item('Kilometraje', fmtKm(v.kilometraje))}</div></div>
+    ${item('Placa', v.placa)}${item('Modelo (año)', v.modelo)}${item('Combustible', combTxt(v.combustible))}
+    ${item('Norma EURO', electrico ? 'No aplica (eléctrico)' : n ? 'EURO ' + n : v.version_euro)}${item('Estado', estadoTxt(v.estado))}${item('Kilometraje', fmtKm(v.kilometraje))}</div></div>
   ${em ? `<div class="card"><h3>Análisis de Emisiones (vs. EURO ${MIN})</h3><div class="grid">
     ${tarjeta('Monóxido de Carbono (CO)', em.co, LIM.co, 4)}${tarjeta('Óxidos de Nitrógeno (NOx)', em.nox, LIM.nox, 1.2)}${tarjeta('Material Particulado (PM)', em.pm, LIM.pm, .2)}</div></div>` : ''}
   ${bloqueEmisionesKm(v, em)}

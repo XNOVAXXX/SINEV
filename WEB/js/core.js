@@ -41,7 +41,15 @@ const masaPartes = g => Math.abs(g) >= 1000 ? [(g / 1000).toLocaleString('es-CO'
 const fmtMasa = g => masaPartes(g).join(' ');
 const fmtKm = km => km == null ? 'Sin dato' : Number(km).toLocaleString('es-CO') + ' km';
 const esElectrico = v => v?.combustible === 'Electrico';
-const badge = (n, comb) => comb === 'Electrico' ? '<span class="euro e0">Eléctrico · no aplica</span>'
+// Textos legibles para los valores de la base (que se guardan sin tildes)
+const COMB_TXT = { Electrico: 'Eléctrico', Hibrido: 'Híbrido', Diesel: 'Diésel', Gasolina: 'Gasolina' };
+const combTxt = c => COMB_TXT[c] ?? c ?? '—';
+const ESTADO_TXT = { 'en circulacion': 'En circulación', 'fuera de circulacion': 'Fuera de circulación', todos: 'Todos' };
+const estadoTxt = e => ESTADO_TXT[e] ?? e ?? '—';
+const estadoChip = e => `<span class="estado ${e === 'en circulacion' ? 'activo' : 'inactivo'}">${esc(estadoTxt(e))}</span>`;
+const capital = s => s ? s.charAt(0).toUpperCase() + s.slice(1) : s;
+const canalesTxt = cs => (cs ?? []).map(c => c === 'sms' ? 'SMS' : c === 'whatsapp' ? 'WhatsApp' : capital(c)).join(', ');
+const badge = (n, comb) => comb === 'Electrico' ? '<span class="euro e0">No aplica</span>'
   : `<span class="euro e${n ?? 0}">${n ? 'EURO ' + n : 'EURO sin dato'}</span>`;
 const item = (l, v) => `<div><small>${l}</small><b>${esc(v)}</b></div>`;
 const fechaCO = f => new Date(f).toLocaleDateString('es-CO', { year: 'numeric', month: 'long', day: 'numeric' });
@@ -55,10 +63,8 @@ async function cargarPerfil() {
 }
 function pintarUsuario() {
   $('#user').innerHTML = perfil
-    ? `<b>${esc(perfil.nombre)}</b> <span class="chip">${esc(perfil.rol)}</span> <button class="btn ghost" id="out">Cerrar sesión</button>`
+    ? `<b>${esc(perfil.nombre)}</b> <span class="chip rol-${esc(perfil.rol)}">${esc(capital(perfil.rol))}</span> <button class="btn ghost" id="out">Cerrar sesión</button>`
     : `<button class="btn" id="in">Iniciar sesión</button>`;
-  $('#sesion').className = perfil?.rol === 'administrador' ? 'admin' : perfil ? 'operador' : '';
-  $('#sesion').textContent = perfil ? `Sesión activa como ${perfil.rol} — ${perfil.nombre}` : '';
   $('#in')?.addEventListener('click', abrirLogin);
   $('#out')?.addEventListener('click', () => sb.auth.signOut());   // el aviso SIGNED_OUT actualiza la interfaz
 }

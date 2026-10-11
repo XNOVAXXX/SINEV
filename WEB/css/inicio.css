@@ -61,3 +61,146 @@
 .kpi small {
     color: var(--g)
 }
+
+/* Buscador de placa en el banner */
+.hero-search {
+    display: flex;
+    gap: 10px;
+    max-width: 560px
+}
+
+.hero-input {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #fff;
+    border-radius: 10px;
+    padding: 0 12px;
+    color: var(--g)
+}
+
+.hero-input svg {
+    width: 18px;
+    height: 18px;
+    flex: none
+}
+
+.hero-input input {
+    border: 0;
+    padding: 12px 0;
+    font-size: 16px;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    outline: none
+}
+
+.hero-input input::placeholder {
+    text-transform: none;
+    letter-spacing: 0
+}
+
+.hero-input:focus-within {
+    box-shadow: 0 0 0 3px #93c5fd
+}
+
+.hero .hero-search .btn {
+    background: #0f172a;
+    color: #fff
+}
+
+.hero .hero-msg {
+    min-height: 0;
+    margin: 8px 0 0;
+    color: #fde68a;
+    font-size: 14px
+}
+
+.hero .hero-msg:empty {
+    display: none
+}
+
+.hero .home-actions {
+    margin-top: 18px
+}
+
+.kpis:empty {
+    display: none
+}
+
+/* ¿Cómo funciona? */
+.pasos {
+    margin: 28px 0 8px
+}
+
+.pasos[hidden] {
+    display: none
+}
+
+.pasos h2 {
+    font-size: 20px;
+    margin: 0 0 14px
+}
+
+.pasos-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 14px
+}
+
+.paso {
+    background: #fff;
+    border-radius: 14px;
+    box-shadow: 0 1px 6px #0002;
+    padding: 20px
+}
+
+.paso b {
+    display: block;
+    margin: 12px 0 6px
+}
+
+.paso p {
+    margin: 0;
+    color: #4b5563;
+    font-size: 14px;
+    line-height: 1.5
+}
+
+.paso-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    background: #eff6ff;
+    color: var(--b);
+    display: grid;
+    place-items: center
+}
+
+.paso-icon svg {
+    width: 20px;
+    height: 20px
+}
+
+@media(max-width:600px) {
+    .hero {
+        padding: 28px 20px
+    }
+
+    .hero h1 {
+        font-size: 24px
+    }
+
+    .hero-search {
+        flex-direction: column
+    }
+
+    .hero-search .btn {
+        justify-content: center
+    }
+
+    .hero .home-actions {
+        justify-content: stretch;
+        flex-wrap: wrap
+    }
+}

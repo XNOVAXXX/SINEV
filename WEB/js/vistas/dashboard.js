@@ -26,7 +26,7 @@ function vistaDatos() {
     <label>Buscar (placa, cédula o nombre)<input id="fq" value="${T.q ? esc(T.q) : ''}"></label>
     ${sel('fe', 'Norma EURO', [...[1,2,3,4,5,6].map(n => [String(n), 'EURO ' + n]), ['null', 'Sin dato']], T.euro)}
     ${sel('fs', 'Estado', [['en circulacion', 'En circulación'], ['fuera de circulacion', 'Fuera de circulación']], T.estado)}
-    ${sel('fc', 'Combustible', ['Diesel','Hibrido','Electrico','Gasolina'].map(c => [c, c]), T.comb)}
+    ${sel('fc', 'Combustible', ['Diesel','Hibrido','Electrico','Gasolina'].map(c => [c, combTxt(c)]), T.comb)}
     <button class="btn">Filtrar</button></form></div>
     <div class="card"><div class="tblwrap" id="tbl">Cargando…</div><div class="pager" id="pg"></div></div>`;
   $('#ff').onsubmit = e => { e.preventDefault(); Object.assign(T, { q: $('#fq').value, euro: $('#fe').value, estado: $('#fs').value, comb: $('#fc').value, page: 0 }); cargarDatos(); };
@@ -42,8 +42,8 @@ async function cargarDatos() {
   const { data, count, error } = await q;
   if (error) { $('#tbl').innerHTML = `<p class="err">${esc(error.message)}</p>`; return; }
   $('#tbl').innerHTML = `<table><thead><tr><th>Placa</th><th>Propietario</th><th>Cédula</th><th>Teléfono</th><th>Modelo</th><th>Combustible</th><th>Kilometraje</th><th>EURO</th><th>Estado</th></tr></thead><tbody>${
-    data.map(v => `<tr class="click" data-p="${esc(v.placa)}"><td><b>${esc(v.placa)}</b></td><td>${esc(v.nombre)}</td><td>${esc(v.cedula)}</td><td>${esc(v.telefono)}</td>
-      <td>${esc(v.modelo)}</td><td>${esc(v.combustible)}</td><td>${esc(fmtKm(v.kilometraje))}</td><td>${badge(v.nivel_euro, v.combustible)}</td><td>${esc(v.estado)}</td></tr>`).join('') || '<tr><td colspan="9">Sin resultados.</td></tr>'}</tbody></table>`;
+    data.map(v => `<tr class="click" data-p="${esc(v.placa)}"><td><b>${esc(v.placa)}</b></td><td>${esc(v.nombre)}</td><td class="num">${esc(v.cedula)}</td><td class="num">${esc(v.telefono)}</td>
+      <td>${esc(v.modelo)}</td><td>${esc(combTxt(v.combustible))}</td><td class="num">${esc(fmtKm(v.kilometraje))}</td><td>${badge(v.nivel_euro, v.combustible)}</td><td>${estadoChip(v.estado)}</td></tr>`).join('') || '<tr><td colspan="9">Sin resultados.</td></tr>'}</tbody></table>`;
   document.querySelectorAll('#tbl tr.click').forEach(tr => tr.onclick = () => location.hash = '#/consultas/' + encodeURIComponent(tr.dataset.p));
   const ini = count ? T.page * T.size + 1 : 0, fin = Math.min((T.page + 1) * T.size, count ?? 0);
   $('#pg').innerHTML = `<span>Mostrando ${ini}–${fin} de ${(count ?? 0).toLocaleString('es-CO')}</span><span class="row">
@@ -58,7 +58,7 @@ const EJEMPLO = { nombre: 'María López', placa: 'ABC123', nivel: '2', modelo: 
 const rellenar = txt => txt.replace(/\{(\w+)\}/g, (m, k) => EJEMPLO[k] ?? m);
 
 async function vistaCampanas() {
-  const chk = (name, vals, marcados) => vals.map(v => `<label><input type="checkbox" name="${name}" value="${v}" ${marcados.includes(v) ? 'checked' : ''}> ${v}</label>`).join('');
+  const chk = (name, vals, marcados) => vals.map(v => `<label><input type="checkbox" name="${name}" value="${v}" ${marcados.includes(v) ? 'checked' : ''}> ${combTxt(v)}</label>`).join('');
   $('#sub').innerHTML = `<div class="card"><h3>Nueva campaña de notificación</h3>
     <p class="demo">Notifica a los propietarios de vehículos que no cumplen la Norma EURO 4. Cada vehículo recibe su siguiente aviso (1.º, 2.º o 3.º; máximo 3) y deben pasar al menos 20 días entre avisos. Todos los filtros son opcionales y se combinan. Los avisos quedan registrados en SINEV (no se envían mensajes reales) y no se pueden modificar ni eliminar.</p>
     <form id="fc" class="form-grid">
@@ -139,7 +139,7 @@ async function vistaCampanas() {
   icons();
 }
 const resumenFiltros = c => [
-  c.combustibles?.length ? c.combustibles.join(' / ') : null,
+  c.combustibles?.length ? c.combustibles.map(combTxt).join(' / ') : null,
   c.km_min != null || c.km_max != null ? `${(c.km_min ?? 0).toLocaleString('es-CO')}–${c.km_max != null ? c.km_max.toLocaleString('es-CO') : '∞'} km` : null,
   c.modelo_min != null || c.modelo_max != null ? `modelo ${c.modelo_min ?? '…'}–${c.modelo_max ?? '…'}` : null,
   c.ciudad ? `ciudad: ${c.ciudad}` : null,
@@ -148,7 +148,7 @@ async function historialCampanas() {
   const { data, error } = await sb.from('campanas').select('*').order('creada_en', { ascending: false }).limit(20);
   $('#hist').innerHTML = error ? `<p class="err">${esc(error.message)}</p>` : data.length
     ? `<table><thead><tr><th>Fecha</th><th>Campaña</th><th>EURO</th><th>Estado</th><th>Filtros</th><th>Canales</th><th>Vehículos</th><th>Ejecutó</th></tr></thead><tbody>${data.map(c => `<tr>
-      <td>${fechaCO(c.creada_en)}</td><td><b>${esc(c.nombre)}</b></td><td>${c.niveles.join(', ')}</td><td>${esc(c.estado_filtro)}</td><td>${esc(resumenFiltros(c))}</td><td>${c.canales.join(', ')}</td><td>${c.total}</td><td>${esc(c.ejecutada_por)}</td></tr>`).join('')}</tbody></table>`
+      <td class="num">${fechaCO(c.creada_en)}</td><td><b>${esc(c.nombre)}</b></td><td class="num">${c.niveles.join(', ')}</td><td class="num">${esc(estadoTxt(c.estado_filtro))}</td><td>${esc(resumenFiltros(c))}</td><td>${esc(canalesTxt(c.canales))}</td><td>${c.total}</td><td>${esc(c.ejecutada_por)}</td></tr>`).join('')}</tbody></table>`
     : '<p>Aún no se ha ejecutado ninguna campaña.</p>';
 }
 
@@ -198,5 +198,5 @@ async function mensajeFuncion(error) {
 async function listaUsuarios() {
   const { data, error } = await sb.from('perfiles').select('username,nombre,rol').order('rol').order('username');
   $('#ulist').innerHTML = error ? `<p class="err">${esc(error.message)}</p>` : `<table><thead><tr><th>Usuario</th><th>Nombre</th><th>Rol</th></tr></thead><tbody>${
-    data.map(u => `<tr><td><b>${esc(u.username)}</b></td><td>${esc(u.nombre)}</td><td><span class="chip">${esc(u.rol)}</span></td></tr>`).join('') || '<tr><td colspan="3">Sin usuarios.</td></tr>'}</tbody></table>`;
+    data.map(u => `<tr><td><b>${esc(u.username)}</b></td><td>${esc(u.nombre)}</td><td><span class="chip rol-${esc(u.rol)}">${esc(capital(u.rol))}</span></td></tr>`).join('') || '<tr><td colspan="3">Sin usuarios.</td></tr>'}</tbody></table>`;
 }
