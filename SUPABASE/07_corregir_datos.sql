@@ -7,7 +7,7 @@
 --   · Nombres y correos variados · "Sin dato" en lugar de "Euro" cuando no hay norma
 --   · Kilometraje recalculado con el nuevo año de modelo
 -- Paso 1: los 1000 vehículos de 02_datos.sql quedan exactamente igual que en una carga nueva.
--- Paso 2: cualquier otro vehículo de la base (agregado aparte) se corrige con las mismas reglas.
+-- Paso 2 y 3: cualquier otro vehículo de la base (agregado o modificado aparte) se corrige con las mismas reglas.
 -- No cambia placas, cédulas, teléfonos, direcciones, niveles EURO ni estado de circulación.
 -- Ejecutar después de 01-06, TODO el archivo de una vez. Se puede repetir sin problema.
 -- ════════════════════════════════════════════════════════════
@@ -1025,7 +1025,11 @@ update public.vehiculos v set
 from _correccion c
 where v.placa = c.placa;
 
--- Paso 2: reglas para cualquier vehículo que siga incoherente
+-- Paso 2: los eléctricos no tienen norma EURO (no emiten por escape): nivel vacío y "No aplica"
+update public.vehiculos set nivel_euro = null, version_euro = 'No aplica'
+where combustible = 'Electrico' and (nivel_euro is not null or version_euro is distinct from 'No aplica');
+
+-- Paso 3: reglas para cualquier vehículo que siga incoherente
 update public.vehiculos v set
   modelo = x.modelo, combustible = x.combustible,
   version_euro = case when v.nivel_euro is null and v.combustible <> 'Electrico' and v.version_euro ilike 'euro%' then 'Sin dato' else v.version_euro end,
@@ -1050,7 +1054,7 @@ commit;
 -- Comprobación: "incoherentes" debe ser 0
 select
   (select count(*) from public.vehiculos) as total_vehiculos,
-  (select count(*) from public.vehiculos where combustible = 'Electrico' and modelo < 2012
+  (select count(*) from public.vehiculos where combustible = 'Electrico' and (modelo < 2012 or nivel_euro is not null)
      or (nivel_euro = 1 and modelo not between 1993 and 1996) or (nivel_euro = 2 and modelo not between 1997 and 2000)
      or (nivel_euro = 3 and modelo not between 2001 and 2005) or (nivel_euro = 4 and modelo not between 2006 and 2010)
      or (nivel_euro = 5 and modelo not between 2011 and 2014) or (nivel_euro = 6 and modelo < 2015)) as incoherentes;
