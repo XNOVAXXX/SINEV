@@ -1,0 +1,22 @@
+# Publicación en Netlify: sirve la carpeta WEB.
+# En Netlify > Site configuration > Environment variables crea SUPABASE_URL y SUPABASE_ANON_KEY.
+[build]
+  publish = "WEB"
+  command = "node DEPLOY/generar-config.mjs"
+
+[build.environment]
+  NODE_VERSION = "20"
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Content-Type-Options = "nosniff"
+    X-Frame-Options = "DENY"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "camera=(), microphone=(), geolocation=()"
+    Content-Security-Policy = "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self' https://*.supabase.co wss://*.supabase.co; frame-ancestors 'none'; base-uri 'self'; form-action 'self'"
+
+[[headers]]
+  for = "/js/config.js"
+  [headers.values]
+    Cache-Control = "no-cache"

@@ -62,3 +62,11 @@ En cada cambio que se sube a GitHub se ejecutan dos pruebas (pestaña **Actions*
 - **Página:** abre SINEV en Chromium con los datos de `02_datos.sql` (sin conectarse a Supabase) y revisa que no haya errores ni desbordes en computador y celular, en modo claro y oscuro, además del buscador, la exportación, el detalle de campañas y la impresión (`tests/web/prueba.mjs`).
 
 Para correrlas en tu equipo: `sh tests/sql/correr.sh` (con un Postgres local) y `cd tests/web && npm ci && npx playwright install chromium && npm test`.
+
+## Publicar en internet (Netlify)
+El repositorio puede seguir privado. `netlify.toml` publica la carpeta `WEB` con las mismas cabeceras de seguridad que nginx.
+1. Entra a https://app.netlify.com con tu cuenta de GitHub y elige **Add new site > Import an existing project > GitHub > XNOVAXXX/SINEV** (autoriza el repositorio si lo pide).
+2. Deja los valores que lee de `netlify.toml` y, antes de publicar, en **Environment variables** agrega `SUPABASE_URL` y `SUPABASE_ANON_KEY` (la clave **anon**, nunca la service_role).
+3. Publica. Cada vez que subas cambios a `main`, Netlify vuelve a publicar solo. El enlace queda como `https://<nombre>.netlify.app` (se puede cambiar en Site configuration > Site details).
+
+Al construir, `DEPLOY/generar-config.mjs` crea `WEB/js/config.js` con esas dos variables; si faltan, la publicación falla en vez de subir una página rota.
