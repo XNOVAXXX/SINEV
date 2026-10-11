@@ -1,0 +1,163 @@
+.consultation-search .tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 14px
+}
+
+.consultation-search .tab {
+    border: 0;
+    background: #f3f4f6;
+    padding: 9px 16px;
+    border-radius: 8px;
+    cursor: pointer
+}
+
+.consultation-search .tab.on {
+    background: var(--b);
+    color: #fff
+}
+
+.consultation-search #f {
+    display: flex;
+    gap: 10px
+}
+
+.euro-reference {
+    padding: 0;
+    overflow: hidden
+}
+
+.reference-toggle {
+    width: 100%;
+    border: 0;
+    background: #fff;
+    padding: 20px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    cursor: pointer;
+    color: #0f172a;
+    text-align: left
+}
+
+.reference-toggle:hover {
+    background: #fafcff
+}
+
+.reference-title {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    flex-wrap: wrap
+}
+
+.reference-title>svg {
+    width: 19px;
+    height: 19px;
+    color: #2563eb
+}
+
+.reference-chip {
+    background: #2563eb;
+    color: #fff;
+    border-radius: 999px;
+    padding: 5px 11px;
+    font-size: 11px;
+    font-weight: 600
+}
+
+.reference-toggle>#euroChevron {
+    width: 18px;
+    height: 18px;
+    color: #64748b;
+    flex: none
+}
+
+.reference-panel {
+    padding: 0 24px 8px
+}
+
+.reference-panel[hidden] {
+    display: none
+}
+
+.euro-table {
+    font-size: 13px
+}
+
+.euro-table th {
+    background: #f1f3f6;
+    color: #111827;
+    text-transform: none;
+    font-size: 13px;
+    padding: 11px 12px
+}
+
+.euro-table td {
+    padding: 14px 12px;
+    border-top: 1px solid #e7ebf0;
+    color: #18304e
+}
+
+.euro-table td:nth-child(2),
+.euro-table td:nth-child(3),
+.euro-table td:nth-child(4),
+.euro-table td:nth-child(5) {
+    text-align: center;
+    white-space: nowrap
+}
+
+.euro-table td:last-child {
+    color: #48627f
+}
+
+.euro-table tbody tr.minimum {
+    outline: 1px solid #3b82f6;
+    outline-offset: -1px;
+    background: #fff
+}
+
+.minimum-label {
+    color: #2563eb;
+    font-size: 11px;
+    font-weight: 700;
+    margin-left: 5px;
+    white-space: nowrap
+}
+
+.euro-table .euro {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    min-width: 68px;
+    padding: 4px 10px;
+    font-size: 11px;
+    font-weight: 700
+}
+
+@media(max-width:600px) {
+    .consultation-search #f {
+        flex-direction: column
+    }
+
+    .reference-toggle {
+        padding: 17px 16px
+    }
+
+    .reference-panel {
+        padding: 0 10px 8px
+    }
+
+    .euro-table {
+        min-width: 820px
+    }
+}
+
+.banner-title {
+    margin: 0
+}
+
+.result-actions {
+    justify-content: flex-start
+}

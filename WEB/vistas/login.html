@@ -1,0 +1,33 @@
+<section class="login-shell" aria-label="Acceso interno SINEV">
+  <div class="login-brand-panel">
+    <div class="login-brand">
+      <div class="login-brand-icon"><i data-lucide="car-front"></i></div>
+      <div>
+        <div class="login-brand-name">SINEV</div>
+        <div class="login-brand-subtitle">Sistema Integrado de Notificación<br>por Emisiones Vehiculares</div>
+      </div>
+    </div>
+
+    <div class="login-kicker"><i data-lucide="log-in"></i> ACCESO INTERNO</div>
+    <h1>Portal de Gestión<br>Vehicular</h1>
+    <p>Plataforma exclusiva para el personal autorizado de SINEV. Gestione vehículos, consulte emisiones y administre notificaciones de incumplimiento de normas EURO.</p>
+  </div>
+
+  <div class="login-form-panel">
+    <form id="fLogin" class="login-form">
+      <h2>Iniciar Sesión</h2>
+      <p class="login-subtitle">Ingresa tus credenciales para acceder al sistema de gestión.</p>
+
+      <label>Usuario
+        <span class="login-input"><i data-lucide="user-round"></i><input name="u" autocomplete="username" placeholder="Ingresa tu usuario" required></span>
+      </label>
+      <label>Contraseña
+        <span class="login-input"><i data-lucide="lock-keyhole"></i><input name="p" type="password" autocomplete="current-password" placeholder="Ingresa tu contraseña" required><button type="button" id="togglePassword" aria-label="Mostrar contraseña"><i data-lucide="eye"></i></button></span>
+      </label>
+
+      <p id="errLogin" class="err"></p>
+      <button class="login-submit" type="submit"><i data-lucide="log-in"></i> Ingresar al Sistema</button>
+      <a class="login-back" href="#/">Volver al inicio</a>
+    </form>
+  </div>
+</section>

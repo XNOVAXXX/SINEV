@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "sinev-web",
+      "runtimeExecutable": "docker",
+      "runtimeArgs": ["compose", "-f", "DOCKER/docker-compose.yml", "up", "--build", "web"],
+      "port": 8080
+    }
+  ]
+}

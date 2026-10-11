@@ -1,0 +1,15 @@
+services:
+  web:
+    build:
+      context: ..
+      dockerfile: DOCKER/Dockerfile
+    ports: ["8080:80"]
+    env_file: ../.env
+  usuarios:
+    image: node:20-alpine
+    profiles: [tools]
+    working_dir: /app
+    # Solo se monta el script (lectura): npm instala dentro del contenedor y no ensucia la carpeta del proyecto
+    volumes: ["../AUTENTICACION/crear-usuarios.mjs:/app/crear-usuarios.mjs:ro"]
+    env_file: ../.env
+    command: sh -c "npm i --silent @supabase/supabase-js && node crear-usuarios.mjs"

@@ -1,0 +1,39 @@
+<h1><i data-lucide="wind"></i> Consulta de Vehículos y Norma EURO</h1>
+<section class="card consultation-search">
+  <div class="tabs">
+    <button class="tab on" data-t="placa">Buscar por Placa</button>
+    <button class="tab" data-t="documento">Buscar por Cédula</button>
+  </div>
+  <form id="f">
+    <input id="q" placeholder="Ej: GKV921" maxlength="7" autocomplete="off">
+    <button class="btn">Consultar</button>
+  </form>
+  <p id="msg"></p>
+</section>
+
+<div id="res"></div>
+
+<section class="card euro-reference">
+  <button class="reference-toggle" id="euroToggle" type="button" aria-expanded="true" aria-controls="euroPanel">
+    <span class="reference-title"><i data-lucide="wind"></i><strong>Tabla de Referencia: Normas EURO de Emisiones</strong><span class="reference-chip">Norma mínima: EURO 4</span></span>
+    <i id="euroChevron" data-lucide="chevron-up"></i>
+  </button>
+
+  <div id="euroPanel" class="reference-panel">
+    <div class="tblwrap">
+      <table class="euro-table">
+        <thead>
+          <tr><th>Norma</th><th>Año vigencia</th><th>CO (g/km)</th><th>NOx (g/km)</th><th>PM (g/km)</th><th>Descripción</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><span class="euro e1">● EURO 1</span></td><td>1993</td><td>2.72</td><td>0.970</td><td>0.1400</td><td>Primera normativa anticontaminación europea.</td></tr>
+          <tr><td><span class="euro e2">● EURO 2</span></td><td>1997</td><td>2.20</td><td>0.500</td><td>0.0800</td><td>Reducción moderada de CO e hidrocarburos.</td></tr>
+          <tr><td><span class="euro e3">● EURO 3</span></td><td>2001</td><td>2.30</td><td>0.150</td><td>0.0500</td><td>Primer límite independiente de NOx.</td></tr>
+          <tr class="minimum"><td><span class="euro e4">● EURO 4</span> <span class="minimum-label">← mínima</span></td><td>2006</td><td>1.00</td><td>0.080</td><td>0.0250</td><td>Norma mínima vigente exigida por SINEV.</td></tr>
+          <tr><td><span class="euro e5">● EURO 5</span></td><td>2011</td><td>1.00</td><td>0.060</td><td>0.0050</td><td>Introducción de filtro de partículas (DPF).</td></tr>
+          <tr><td><span class="euro e6">● EURO 6</span></td><td>2015</td><td>1.00</td><td>0.060</td><td>0.0045</td><td>Estándar más exigente, ensayos RDE en carretera.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>

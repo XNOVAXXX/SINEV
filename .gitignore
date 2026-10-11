@@ -1,0 +1,14 @@
+# Variables y secretos locales
+.env
+.env.*
+!.env.example
+# Configuración local del navegador (tiene la URL y la clave de Supabase); la plantilla es config.example.js
+WEB/js/config.js
+
+# Dependencias / temporales
+node_modules/
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log

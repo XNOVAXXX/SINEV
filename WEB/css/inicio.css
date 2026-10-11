@@ -1,0 +1,63 @@
+.hero {
+    background: linear-gradient(90deg, #2563eb, #1e3a8a);
+    color: #fff;
+    border-radius: 16px;
+    padding: 40px 28px;
+    margin: 16px 0
+}
+
+.hero h1 {
+    margin: 0 0 8px;
+    font-size: 32px
+}
+
+.hero p {
+    color: #dbeafe;
+    margin: 0 0 20px
+}
+
+.hero .btn {
+    background: #fff;
+    color: var(--b)
+}
+
+.hero .btn.alt {
+    background: #1d4ed8;
+    color: #fff;
+    border: 1px solid #60a5fa
+}
+
+.home-actions {
+    justify-content: flex-start
+}
+
+.home-about {
+    margin-top: 16px
+}
+
+.home-about .demo {
+    text-align: left
+}
+
+.kpis {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+    gap: 14px
+}
+
+.kpi {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 1px 6px #0002;
+    padding: 16px
+}
+
+.kpi b {
+    display: block;
+    font-size: 28px;
+    color: var(--b)
+}
+
+.kpi small {
+    color: var(--g)
+}

@@ -1,0 +1,5 @@
+# Fin de línea: el script de Docker debe quedar con LF aunque se clone en Windows
+* text=auto
+*.sh text eol=lf
+DOCKER/Dockerfile text eol=lf
+DOCKER/nginx.conf text eol=lf
