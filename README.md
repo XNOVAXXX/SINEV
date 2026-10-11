@@ -55,3 +55,10 @@ Las librerías del navegador están dentro del proyecto en `WEB/js/vendor/` (Luc
 - Inicio de sesión en pantalla dividida (`WEB/vistas/login.html`, `WEB/js/vistas/login.js`).
 - Roles en `AUTENTICACION/Administrador` y `AUTENTICACION/Operador`.
 - CSS separado por vista en `WEB/css/` (`base`, `index`, `inicio`, `consultas`, `dashboard`, `login`).
+
+## Pruebas automáticas
+En cada cambio que se sube a GitHub se ejecutan dos pruebas (pestaña **Actions** del repositorio):
+- **Base de datos:** crea un Postgres desde cero con `SUPABASE/01-08`, repite los scripts para comprobar que se pueden volver a ejecutar y revisa los datos, la privacidad, el bloqueo de solo lectura, las campañas y los permisos de cada rol (`tests/sql/verificar.sql`).
+- **Página:** abre SINEV en Chromium con los datos de `02_datos.sql` (sin conectarse a Supabase) y revisa que no haya errores ni desbordes en computador y celular, en modo claro y oscuro, además del buscador, la exportación, el detalle de campañas y la impresión (`tests/web/prueba.mjs`).
+
+Para correrlas en tu equipo: `sh tests/sql/correr.sh` (con un Postgres local) y `cd tests/web && npm ci && npx playwright install chromium && npm test`.

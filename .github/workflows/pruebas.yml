@@ -1,0 +1,51 @@
+# Pruebas automáticas de SINEV: se ejecutan en cada push y en cada pull request.
+# Resultado en GitHub → pestaña Actions.
+name: Pruebas
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  base-de-datos:
+    name: Base de datos (SQL)
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: sinev
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd pg_isready --health-interval 5s --health-timeout 5s --health-retries 10
+    env:
+      PGHOST: localhost
+      PGPORT: 5432
+      PGUSER: postgres
+      PGPASSWORD: postgres
+      PGDATABASE: sinev
+    steps:
+      - uses: actions/checkout@v4
+      - name: Crear la base con SUPABASE/01-08 y verificar
+        run: sh tests/sql/correr.sh
+
+  pagina:
+    name: Página (navegador)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: tests/web
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Revisar la sintaxis de los JavaScript
+        working-directory: WEB/js
+        run: for f in *.js vistas/*.js; do node --check "$f"; done
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - name: Probar la página en Chromium
+        run: npm test

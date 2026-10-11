@@ -1,0 +1,7 @@
+{
+  "name": "sinev-pruebas-web",
+  "private": true,
+  "type": "module",
+  "scripts": { "test": "node prueba.mjs" },
+  "devDependencies": { "playwright": "1.56.1" }
+}
