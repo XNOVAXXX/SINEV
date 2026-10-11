@@ -1,22 +1,23 @@
 -- ════════════════════════════════════════════════════════════
 -- SINEV · Corrección de los datos sintéticos (v3)
--- Para una base que YA tiene cargado el 02_datos.sql anterior. En una base nueva no hace falta:
+-- Para una base que YA tiene datos cargados. En una base nueva no hace falta:
 -- el 02_datos.sql actual ya trae los datos corregidos.
 --   · Año de modelo coherente con la norma EURO (EURO 1: 1993-1996 … EURO 6: 2015 en adelante)
 --   · Eléctricos de 2012 en adelante · sin híbridos EURO 1-2 (pasan a gasolina)
 --   · Nombres y correos variados · "Sin dato" en lugar de "Euro" cuando no hay norma
 --   · Kilometraje recalculado con el nuevo año de modelo
+-- Paso 1: los 1000 vehículos de 02_datos.sql quedan exactamente igual que en una carga nueva.
+-- Paso 2: cualquier otro vehículo de la base (agregado aparte) se corrige con las mismas reglas.
 -- No cambia placas, cédulas, teléfonos, direcciones, niveles EURO ni estado de circulación.
--- Ejecutar después de 01-06. Se puede repetir sin problema.
+-- Ejecutar después de 01-06, TODO el archivo de una vez. Se puede repetir sin problema.
 -- ════════════════════════════════════════════════════════════
 begin;
 -- SINEV es de solo lectura: se desactiva el candado solo durante esta corrección
 alter table public.vehiculos disable trigger solo_lectura;
 
-update public.vehiculos v set
-  nombre = c.nombre, correo = c.correo, modelo = c.modelo, version_euro = c.version_euro, combustible = c.combustible,
-  kilometraje = public.km_sintetico(v.placa, c.modelo, c.combustible)
-from (values
+-- Paso 1: valores corregidos de los vehículos de 02_datos.sql
+create temp table _correccion (placa text primary key, nombre text, correo text, modelo int, version_euro text, combustible text) on commit drop;
+insert into _correccion values
   ('GKV921','Felipe Mendoza Correa','felipe.mendoza767@hotmail.com',2011,'Euro 5','Gasolina'),
   ('WOI116','Angela Lopez','angela.lopez855@gmail.com',2017,'No aplica','Electrico'),
   ('BKC610','Manuela Hernandez Diaz','manuela.hernandez903@yahoo.com',2004,'Euro 3','Diesel'),
@@ -1016,16 +1017,40 @@ from (values
   ('TTG755','Luis Rios Diaz','luis.rios182@outlook.com',2002,'Euro 3','Gasolina'),
   ('XIK815','Catalina Diaz','catalina.diaz898@hotmail.com',2003,'Euro 3','Diesel'),
   ('COK647','Juan Pablo Salazar','juan.pablo.salazar307@outlook.com',1993,'Euro 1','Gasolina'),
-  ('CFC907','Isabella Gomez Ortiz','isabella.gomez469@hotmail.com',2017,'Euro 6','Diesel')
-) as c(placa, nombre, correo, modelo, version_euro, combustible)
+  ('CFC907','Isabella Gomez Ortiz','isabella.gomez469@hotmail.com',2017,'Euro 6','Diesel');
+
+update public.vehiculos v set
+  nombre = c.nombre, correo = c.correo, modelo = c.modelo, version_euro = c.version_euro, combustible = c.combustible,
+  kilometraje = public.km_sintetico(v.placa, c.modelo, c.combustible)
+from _correccion c
 where v.placa = c.placa;
+
+-- Paso 2: reglas para cualquier vehículo que siga incoherente
+update public.vehiculos v set
+  modelo = x.modelo, combustible = x.combustible,
+  version_euro = case when v.nivel_euro is null and v.combustible <> 'Electrico' and v.version_euro ilike 'euro%' then 'Sin dato' else v.version_euro end,
+  kilometraje = public.km_sintetico(v.placa, x.modelo, x.combustible)
+from (
+  select placa,
+    case when combustible = 'Electrico' then
+           case when modelo is null or modelo < 2012 then 2012 + (abs(hashtext(placa)::bigint) % 14)::int else modelo end
+         when r.desde is not null then
+           case when modelo between r.desde and r.hasta then modelo else r.desde + (abs(hashtext(placa)::bigint) % (r.hasta - r.desde + 1))::int end
+         else modelo end as modelo,
+    case when combustible = 'Hibrido' and nivel_euro <= 2 then 'Gasolina' else combustible end as combustible
+  from public.vehiculos
+  left join (values (1,1993,1996),(2,1997,2000),(3,2001,2005),(4,2006,2010),(5,2011,2014),(6,2015,2025)) as r(nivel,desde,hasta)
+    on r.nivel = nivel_euro
+) x
+where v.placa = x.placa and (v.modelo is distinct from x.modelo or v.combustible is distinct from x.combustible);
 
 alter table public.vehiculos enable trigger solo_lectura;
 commit;
 
--- Comprobación: debe devolver 0
-select count(*) as incoherentes from public.vehiculos
-where (combustible = 'Electrico' and modelo < 2012)
-   or (nivel_euro = 1 and modelo not between 1993 and 1996) or (nivel_euro = 2 and modelo not between 1997 and 2000)
-   or (nivel_euro = 3 and modelo not between 2001 and 2005) or (nivel_euro = 4 and modelo not between 2006 and 2010)
-   or (nivel_euro = 5 and modelo not between 2011 and 2014) or (nivel_euro = 6 and modelo < 2015);
+-- Comprobación: "incoherentes" debe ser 0
+select
+  (select count(*) from public.vehiculos) as total_vehiculos,
+  (select count(*) from public.vehiculos where combustible = 'Electrico' and modelo < 2012
+     or (nivel_euro = 1 and modelo not between 1993 and 1996) or (nivel_euro = 2 and modelo not between 1997 and 2000)
+     or (nivel_euro = 3 and modelo not between 2001 and 2005) or (nivel_euro = 4 and modelo not between 2006 and 2010)
+     or (nivel_euro = 5 and modelo not between 2011 and 2014) or (nivel_euro = 6 and modelo < 2015)) as incoherentes;
